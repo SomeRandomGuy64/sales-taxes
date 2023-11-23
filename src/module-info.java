@@ -1,0 +1,2 @@
+module sales_taxes {
+}
