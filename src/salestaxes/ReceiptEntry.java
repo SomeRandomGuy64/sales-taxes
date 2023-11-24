@@ -1,52 +1,43 @@
 package salestaxes;
 
 public class ReceiptEntry {
-	private int numberOfItems;
-	private String item;
+	private int amount;
+	private String itemDescription;
 	private double priceWithTax;
 	private double totalTax;
 	
-	public ReceiptEntry(int numberOfItems, String item, double priceWithTax, double totalTax) {
-		this.numberOfItems = numberOfItems;
-		this.item = item;
+	public ReceiptEntry(int amount, String itemDescription, double priceWithTax, double totalTax) {
+		this.amount = amount;
+		this.itemDescription = itemDescription;
 		this.priceWithTax = priceWithTax;
 		this.totalTax  = totalTax;
 	}
-
-	public int getNumberOfItems() {
-		return numberOfItems;
+	
+	public ReceiptEntry(Item item, TaxProcessor taxProcessor) {
+		this.amount = item.getAmount();
+		this.itemDescription = item.getItemDescription();
+		this.totalTax  = taxProcessor.calculateTax(item);
+		this.priceWithTax = taxProcessor.finalItemPrice(item);
 	}
 
-	public void setNumberOfItems(int numberOfItems) {
-		this.numberOfItems = numberOfItems;
+	public int getAmount() {
+		return amount;
 	}
 	
-	public String getItem() {
-		return item;
-	}
-
-	public void setItem(String item) {
-		this.item = item;
+	public String getItemDescription() {
+		return itemDescription;
 	}
 
 	public double getPriceWithTax() {
 		return priceWithTax;
 	}
-
-	public void setPriceWithTax(double priceWithTax) {
-		this.priceWithTax = priceWithTax;
-	}
 	
 	public double getTotalTax() {
 		return totalTax;
 	}
-	
-	public void setTotalTax(double totalTax) {
-		this.totalTax = totalTax;
+
+	@Override
+	public String toString() {
+		return String.format("%d %s: %.2f", getAmount(), getItemDescription(), getPriceWithTax());
 	}
-	
-	public void printReciptEntry() {
-		System.out.println(String.format("%d %s: %.2f", getNumberOfItems(), getItem(), getPriceWithTax()));
-	}
-	
 }

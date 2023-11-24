@@ -8,42 +8,42 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException {
-		ArrayList<OrderEntry> orderEntries = createOrder();
+		ArrayList<Item> items = createOrder();
 		
-		ArrayList<ReceiptEntry> receiptEntries = createReceiptFromOrder(orderEntries);
+		ArrayList<ReceiptEntry> receiptEntries = createReceiptFromOrder(items);
 		
 		printReceipt(receiptEntries);
 	}
 	
-	public static ArrayList<OrderEntry> createOrder() throws FileNotFoundException {
+	public static ArrayList<Item> createOrder() throws FileNotFoundException {
 		File aFile = new File("src/resources/input3.txt");
-		Scanner scanner = new Scanner(aFile);
-		
-		ArrayList<OrderEntry> order = new ArrayList<OrderEntry>();
-		
-		while(scanner.hasNextLine()) {
-			OrderEntry orderEntry = new OrderEntry();
-			orderEntry.setOrderEntry(scanner);
-			order.add(orderEntry);
+		try (Scanner scanner = new Scanner(aFile)) {
+			ArrayList<Item> items = new ArrayList<Item>();
+			
+			while(scanner.hasNextLine()) {
+				Item item = new Item();
+				String entry = scanner.nextLine();
+				String[] itemInformation = entry.split(" ");
+				item.parseItem(itemInformation);
+				items.add(item);
+			}
+			return items;
 		}
-		
-		scanner.close();
-		
-		return order;
 	}
 	
-	public static ArrayList<ReceiptEntry> createReceiptFromOrder(ArrayList<OrderEntry> orderEntries) {
+	public static ArrayList<ReceiptEntry> createReceiptFromOrder(ArrayList<Item> items) throws FileNotFoundException {
 		ArrayList<ReceiptEntry> receiptEntries = new ArrayList<ReceiptEntry>();
 		TaxProcessor taxProcessor = new TaxProcessor();
 		
-		for (OrderEntry orderEntry: orderEntries) {
-			double totalTax = taxProcessor.addTax(orderEntry);
+		for (Item item: items) {
+			double totalTax = taxProcessor.calculateTax(item);
 			
 			ReceiptEntry receiptEntry = new ReceiptEntry(
-					orderEntry.getNumberOfItems(),
-					orderEntry.getItem(),
-					totalTax + orderEntry.getPrice(),
-					totalTax);
+					item.getAmount(),
+					item.getItemDescription(),
+					totalTax + item.getPrice(),
+					totalTax
+					);
 			
 			receiptEntries.add(receiptEntry);
 		}
@@ -56,7 +56,7 @@ public class Main {
 		double totalPrice = 0;
 		
 		for (ReceiptEntry receiptEntry: receiptEntries) {
-			receiptEntry.printReciptEntry();
+			System.out.println(receiptEntry);
 			totalSalesTax += receiptEntry.getTotalTax();
 			totalPrice += receiptEntry.getPriceWithTax();
 		}
