@@ -8,60 +8,71 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException {
-		ArrayList<Item> items = createOrder();
+		String filepath = getFilepath(args);
 		
-		ArrayList<ReceiptEntry> receiptEntries = createReceiptFromOrder(items);
+		ArrayList<Item> items = createOrder(filepath);
 		
-		printReceipt(receiptEntries);
+		Receipt receipt = createReceiptFromOrder(items);
+		
+		printReceipt(receipt);
 	}
 	
-	public static ArrayList<Item> createOrder() throws FileNotFoundException {
-		File aFile = new File("src/resources/input3.txt");
+	public static String getFilepath(String[] args) {
+		return args[0];
+	}
+	
+	public static ArrayList<Item> createOrder(String filepath) throws FileNotFoundException {
+		TaxExemptInventory taxExemptInventory = new TaxExemptInventory();
+		
+		File aFile = new File(filepath);
 		try (Scanner scanner = new Scanner(aFile)) {
 			ArrayList<Item> items = new ArrayList<Item>();
 			
 			while(scanner.hasNextLine()) {
-				Item item = new Item();
 				String entry = scanner.nextLine();
 				String[] itemInformation = entry.split(" ");
-				item.parseItem(itemInformation);
+				Item item = parseItem(itemInformation);
+				item.checkIsTaxExempt(taxExemptInventory);
 				items.add(item);
 			}
 			return items;
 		}
 	}
 	
-	public static ArrayList<ReceiptEntry> createReceiptFromOrder(ArrayList<Item> items) throws FileNotFoundException {
-		ArrayList<ReceiptEntry> receiptEntries = new ArrayList<ReceiptEntry>();
+	public static Item parseItem(String[] itemInformation) {
+		int itemAmount = 0;
+		String itemDescription = "";
+		double itemPrice = 0;
+		
+		for (int i = 0; i < itemInformation.length; i++) {
+			
+			if (i == 0) {
+				itemAmount = Integer.parseInt(itemInformation[i]);
+				
+			} else if (i > 0 && i < itemInformation.length - 2) {
+				itemDescription += itemInformation[i] + " ";
+				
+			} else if (i == itemInformation.length - 1) {
+				itemPrice = Double.parseDouble(itemInformation[i]);
+			}
+		}
+		Item item = new Item(itemAmount, itemDescription.trim(), itemPrice);
+		return item;
+	}
+	
+	public static Receipt createReceiptFromOrder(ArrayList<Item> items) {
+		Receipt receipt = new Receipt();
 		TaxProcessor taxProcessor = new TaxProcessor();
 		
 		for (Item item: items) {
-			double totalTax = taxProcessor.calculateTax(item);
-			
-			ReceiptEntry receiptEntry = new ReceiptEntry(
-					item.getAmount(),
-					item.getItemDescription(),
-					totalTax + item.getPrice(),
-					totalTax
-					);
-			
-			receiptEntries.add(receiptEntry);
+			ReceiptEntry receiptEntry = new ReceiptEntry(item, taxProcessor);
+			receipt.addReceiptEntryToReceipt(receiptEntry);
 		}
-		
-		return receiptEntries;
+		return receipt;
 	}
 	
-	public static void printReceipt(ArrayList<ReceiptEntry> receiptEntries) {
-		double totalSalesTax = 0;
-		double totalPrice = 0;
-		
-		for (ReceiptEntry receiptEntry: receiptEntries) {
-			System.out.println(receiptEntry);
-			totalSalesTax += receiptEntry.getTotalTax();
-			totalPrice += receiptEntry.getPriceWithTax();
-		}
-		System.out.println(String.format("Sales taxes: %.2f", totalSalesTax));
-		System.out.println(String.format("Total: %.2f", totalPrice));
+	public static void printReceipt(Receipt receipt) {
+		System.out.println(receipt);
 	}
 
 }

@@ -6,13 +6,6 @@ public class ReceiptEntry {
 	private double priceWithTax;
 	private double totalTax;
 	
-	public ReceiptEntry(int amount, String itemDescription, double priceWithTax, double totalTax) {
-		this.amount = amount;
-		this.itemDescription = itemDescription;
-		this.priceWithTax = priceWithTax;
-		this.totalTax  = totalTax;
-	}
-	
 	public ReceiptEntry(Item item, TaxProcessor taxProcessor) {
 		this.amount = item.getAmount();
 		this.itemDescription = item.getItemDescription();
@@ -38,6 +31,6 @@ public class ReceiptEntry {
 
 	@Override
 	public String toString() {
-		return String.format("%d %s: %.2f", getAmount(), getItemDescription(), getPriceWithTax());
+		return String.format("%d %s: %.2f\n", getAmount(), getItemDescription(), getPriceWithTax());
 	}
 }

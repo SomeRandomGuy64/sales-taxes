@@ -11,7 +11,7 @@ public class TaxProcessor {
 	public double calculateTax(Item item) {		
 		double basicTaxToAdd = 0;
 		double importDutyToAdd = 0;
-		if (!item.getIsBasicTaxExempt()) {
+		if (!item.getIsTaxExempt()) {
 			basicTaxToAdd = item.getPrice() * BASIC_TAX;
 		}
 		if (item.getIsImported()) {
