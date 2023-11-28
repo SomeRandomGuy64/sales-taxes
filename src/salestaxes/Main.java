@@ -29,44 +29,29 @@ public class Main {
 			ArrayList<Item> items = new ArrayList<Item>();
 			
 			while(scanner.hasNextLine()) {
+				Parser parser = new Parser();
+				
 				String entry = scanner.nextLine();
 				String[] itemInformation = entry.split(" ");
-				Item item = parseItem(itemInformation);
-				item.checkIsTaxExempt(taxExemptInventory);
+				parser.parseItem(itemInformation);
+				Item item = new Item(parser.getAmount(), parser.getDescription(), parser.getPrice());
+				setItemTaxValues(item, taxExemptInventory);
 				items.add(item);
 			}
 			return items;
 		}
 	}
 	
-	public static Item parseItem(String[] itemInformation) {
-		int itemAmount = 0;
-		String itemDescription = "";
-		double itemPrice = 0;
-		
-		for (int i = 0; i < itemInformation.length; i++) {
-			
-			if (i == 0) {
-				itemAmount = Integer.parseInt(itemInformation[i]);
-				
-			} else if (i > 0 && i < itemInformation.length - 2) {
-				itemDescription += itemInformation[i] + " ";
-				
-			} else if (i == itemInformation.length - 1) {
-				itemPrice = Double.parseDouble(itemInformation[i]);
-			}
-		}
-		Item item = new Item(itemAmount, itemDescription.trim(), itemPrice);
-		return item;
+	public static void setItemTaxValues(Item item, TaxExemptInventory taxExemptInventory) {
+		item.setIsTaxExempt(taxExemptInventory.getTaxExemptionStatus(item));
+		item.calculateTax();
 	}
 	
 	public static Receipt createReceiptFromOrder(ArrayList<Item> items) {
 		Receipt receipt = new Receipt();
-		TaxProcessor taxProcessor = new TaxProcessor();
 		
 		for (Item item: items) {
-			ReceiptEntry receiptEntry = new ReceiptEntry(item, taxProcessor);
-			receipt.addReceiptEntryToReceipt(receiptEntry);
+			receipt.add(item);
 		}
 		return receipt;
 	}
@@ -74,5 +59,4 @@ public class Main {
 	public static void printReceipt(Receipt receipt) {
 		System.out.println(receipt);
 	}
-
 }
