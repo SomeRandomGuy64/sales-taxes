@@ -12,13 +12,9 @@ public class TaxExemptInventory {
 		loadInventory();
 	}
 	
-	public ArrayList<String> getTaxExemptItems() {
-		return this.taxExemptItems;
-	}
-	
-	public boolean getTaxExemptionStatus(Item item) {
+	public boolean getTaxExemptionStatus(String itemDescription) {
 		for (String taxExemptItem: taxExemptItems) {
-			if (item.getItemDescription().toLowerCase().contains(taxExemptItem)) {
+			if (itemDescription.toLowerCase().contains(taxExemptItem)) {
 				return true;
 			}
 		}

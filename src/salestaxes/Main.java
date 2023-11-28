@@ -8,43 +8,28 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException {
-		String filepath = getFilepath(args);
-		
+		String filepath = args[0];
 		ArrayList<Item> items = createOrder(filepath);
-		
 		Receipt receipt = createReceiptFromOrder(items);
-		
 		printReceipt(receipt);
 	}
-	
-	public static String getFilepath(String[] args) {
-		return args[0];
-	}
-	
+
 	public static ArrayList<Item> createOrder(String filepath) throws FileNotFoundException {
 		TaxExemptInventory taxExemptInventory = new TaxExemptInventory();
+		Parser parser = new Parser(taxExemptInventory);
 		
 		File aFile = new File(filepath);
 		try (Scanner scanner = new Scanner(aFile)) {
 			ArrayList<Item> items = new ArrayList<Item>();
 			
-			while(scanner.hasNextLine()) {
-				Parser parser = new Parser();
-				
+			while(scanner.hasNextLine()) {				
 				String entry = scanner.nextLine();
 				String[] itemInformation = entry.split(" ");
-				parser.parseItem(itemInformation);
-				Item item = new Item(parser.getAmount(), parser.getDescription(), parser.getPrice());
-				setItemTaxValues(item, taxExemptInventory);
+				Item item = parser.parseItem(itemInformation);
 				items.add(item);
 			}
 			return items;
 		}
-	}
-	
-	public static void setItemTaxValues(Item item, TaxExemptInventory taxExemptInventory) {
-		item.setIsTaxExempt(taxExemptInventory.getTaxExemptionStatus(item));
-		item.calculateTax();
 	}
 	
 	public static Receipt createReceiptFromOrder(ArrayList<Item> items) {

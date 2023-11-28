@@ -1,17 +1,19 @@
 package salestaxes;
 
 public class Parser {
-	private int itemAmount;
-	private String itemDescription;
-	double itemPrice;
+	private static final double BASIC_TAX = 0.1;
+	private static final double IMPORT_DUTY = 0.05;
+	private TaxExemptInventory taxExemptInventory;
 	
-	public Parser() {
-		itemAmount = 0;
-		itemDescription = "";
-		itemPrice = 0;
+	public Parser(TaxExemptInventory taxExemptInventory) {
+		this.taxExemptInventory = taxExemptInventory;
 	}
-
-	public void parseItem(String[] itemInformation) {
+	
+	public Item parseItem(String[] itemInformation) {
+		int itemAmount = 0;
+		String itemDescription = "";
+		double itemPrice = 0;
+		
 		for (int i = 0; i < itemInformation.length; i++) {
 			
 			if (i == 0) {
@@ -24,18 +26,35 @@ public class Parser {
 				itemPrice = Double.parseDouble(itemInformation[i]);
 			}
 		}
+		
 		itemDescription = itemDescription.trim();
+		boolean isTaxExempt = taxExemptInventory.getTaxExemptionStatus(itemDescription);
+		boolean isImported = itemDescription.contains("imported");
+		double tax = calculateTax(itemPrice, isTaxExempt, isImported);
+		Item item = new Item(itemAmount, itemDescription, itemPrice, tax);
+		return item;
 	}
 	
-	public int getAmount() {
-		return itemAmount;
+	private double calculateTax(double price, boolean isTaxExempt, boolean isImported) {
+		double taxRate = workOutTaxRate(isTaxExempt, isImported);
+		
+		double tax = price * taxRate;
+		tax = roundTaxUp(tax);
+		return tax;
 	}
 	
-	public String getDescription() {
-		return itemDescription;
+	private double workOutTaxRate(boolean isTaxExempt, boolean isImported) {
+		double taxRate = 0;
+		if (!isTaxExempt) {
+			taxRate += BASIC_TAX;
+		}
+		if (isImported) {
+			taxRate += IMPORT_DUTY;
+		}
+		return taxRate;
 	}
 	
-	public double getPrice() {
-		return itemPrice;
+	private double roundTaxUp(double tax) {
+		return Math.ceil(tax * 20.0) / 20.0;
 	}
 }
