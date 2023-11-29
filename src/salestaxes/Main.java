@@ -11,7 +11,7 @@ public class Main {
 		String filepath = args[0];
 		ArrayList<Item> items = createOrder(filepath);
 		Receipt receipt = createReceiptFromOrder(items);
-		printReceipt(receipt);
+		System.out.println(receipt);
 	}
 
 	public static ArrayList<Item> createOrder(String filepath) throws FileNotFoundException {
@@ -24,8 +24,7 @@ public class Main {
 			
 			while(scanner.hasNextLine()) {				
 				String entry = scanner.nextLine();
-				String[] itemInformation = entry.split(" ");
-				Item item = parser.parseItem(itemInformation);
+				Item item = parser.parseItem(entry);
 				items.add(item);
 			}
 			return items;
@@ -39,9 +38,5 @@ public class Main {
 			receipt.add(item);
 		}
 		return receipt;
-	}
-	
-	public static void printReceipt(Receipt receipt) {
-		System.out.println(receipt);
 	}
 }

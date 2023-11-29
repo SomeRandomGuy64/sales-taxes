@@ -16,7 +16,7 @@ public class Receipt {
 	public void add(Item item) {
 		items.add(item);
 		totalTax += item.getTax();
-		totalPrice += item.getPrice() + item.getTax();
+		totalPrice += item.getPriceWithTax();
 	}
 	
 	@Override

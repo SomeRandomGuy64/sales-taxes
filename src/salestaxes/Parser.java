@@ -9,26 +9,27 @@ public class Parser {
 		this.taxExemptInventory = taxExemptInventory;
 	}
 	
-	public Item parseItem(String[] itemInformation) {
+	public Item parseItem(String entry) {
 		int itemAmount = 0;
 		String itemDescription = "";
 		double itemPrice = 0;
 		
-		for (int i = 0; i < itemInformation.length; i++) {
+		String[] tokens = entry.split(" ");
+		for (int i = 0; i < tokens.length; i++) {
 			
 			if (i == 0) {
-				itemAmount = Integer.parseInt(itemInformation[i]);
+				itemAmount = Integer.parseInt(tokens[i]);
 				
-			} else if (i > 0 && i < itemInformation.length - 2) {
-				itemDescription += itemInformation[i] + " ";
+			} else if (i > 0 && i < tokens.length - 2) {
+				itemDescription += tokens[i] + " ";
 				
-			} else if (i == itemInformation.length - 1) {
-				itemPrice = Double.parseDouble(itemInformation[i]);
+			} else if (i == tokens.length - 1) {
+				itemPrice = Double.parseDouble(tokens[i]);
 			}
 		}
 		
 		itemDescription = itemDescription.trim();
-		boolean isTaxExempt = taxExemptInventory.getTaxExemptionStatus(itemDescription);
+		boolean isTaxExempt = taxExemptInventory.isTaxExempt(itemDescription);
 		boolean isImported = itemDescription.contains("imported");
 		double tax = calculateTax(itemPrice, isTaxExempt, isImported);
 		Item item = new Item(itemAmount, itemDescription, itemPrice, tax);
